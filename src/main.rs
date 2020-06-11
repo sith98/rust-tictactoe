@@ -6,7 +6,7 @@ fn main() {
 
     let mut board = Board::new();
 
-    let player_x = player::HumanPlayer::new();
+    let player_x = player::MinimaxPlayer::new();
     let player_o = player::HumanPlayer::new();
 
     fn check_game_over(board: &Board) -> bool {
@@ -23,10 +23,10 @@ fn main() {
 
     let mut current_piece = Piece::X;
     loop {
+        println!("{}", board);
         if check_game_over(&board) {
             break;
         }
-        println!("{}", board);
         let player: &dyn player::Player = if current_piece == Piece::X {
             &player_x
         } else {

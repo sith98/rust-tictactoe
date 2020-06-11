@@ -37,6 +37,7 @@ static WINNING_INDECES: &'static [(Index, Index, Index)] = &[
     (2, 4, 6),
 ];
 
+#[derive(Clone)]
 pub struct Board {
     board: [Cell; 9],
     n_pieces: u8,
@@ -62,8 +63,10 @@ impl Board {
         true
     }
 
+    pub const VALID_INDECES: std::ops::Range<usize> = 0..9;
+
     pub fn is_valid_index(index: Index) -> bool {
-        index < 9
+        Self::VALID_INDECES.contains(&index)
     }
 
     pub fn is_draw(&self) -> bool {
