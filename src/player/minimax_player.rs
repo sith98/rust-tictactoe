@@ -1,6 +1,6 @@
 use super::Player;
 use crate::board::{Board, Index, Piece};
-use rand::Rng;
+use rand::seq::SliceRandom;
 
 pub struct MinimaxPlayer;
 impl MinimaxPlayer {
@@ -9,50 +9,45 @@ impl MinimaxPlayer {
     }
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Debug)]
 enum GameResult {
     Defeat,
     Draw,
     Victory,
 }
-impl std::ops::Neg for GameResult {
-    type Output = Self;
-    fn neg(self) -> Self::Output {
-        match self {
-            GameResult::Defeat => GameResult::Victory,
-            GameResult::Draw => GameResult::Draw,
-            GameResult::Victory => GameResult::Defeat,
-        }
-    }
-}
 
 // minimax
 impl MinimaxPlayer {
-    fn minimax_search(board: Board, piece: Piece) -> (Vec<Index>, u32) {
+    fn minimax_search(board: Board, piece: Piece) -> (Index, u32) {
         let mut counter = 0;
-        let mut best_moves = Vec::new();
+        let mut best_move = 0;
+        let mut indeces: Vec<_> = Board::VALID_INDECES.collect();
+
+        indeces.shuffle(&mut rand::thread_rng());
 
         Self::minimax_step(
             board.clone(),
             piece,
             true,
-            true,
+            0,
             GameResult::Defeat,
             GameResult::Victory,
-            &mut best_moves,
+            &indeces[..],
+            &mut best_move,
             &mut counter,
         );
-        (best_moves, counter)
+        (best_move, counter)
     }
 
     fn minimax_step(
         board: Board,
         piece: Piece,
         maximizing: bool,
-        top_level: bool,
-        alpha: GameResult,
-        beta: GameResult,
-        best_moves: &mut Vec<Index>,
+        level: u8,
+        mut alpha: GameResult,
+        mut beta: GameResult,
+        indeces: &[Index],
+        best_move: &mut Index,
         counter: &mut u32,
     ) -> GameResult {
         use GameResult::*;
@@ -69,8 +64,8 @@ impl MinimaxPlayer {
             return Defeat;
         }
 
-        let mut best_result = if maximizing { alpha } else { beta };
-        for index in Board::VALID_INDECES {
+        let mut best_result = if maximizing { Defeat } else { Victory };
+        for &index in indeces {
             if !board.cell_is_empty(index) {
                 continue;
             }
@@ -81,26 +76,30 @@ impl MinimaxPlayer {
                 new_board,
                 piece,
                 !maximizing,
-                false,
-                if maximizing { best_result } else { alpha },
-                if maximizing { beta } else { best_result },
-                best_moves,
+                level + 1,
+                alpha,
+                beta,
+                indeces,
+                best_move,
                 counter,
             );
             if maximizing && result > best_result || !maximizing && result < best_result {
                 best_result = result;
-                if top_level {
-                    best_moves.clear();
-                    best_moves.push(index);
-                }
-                if maximizing && best_result >= beta || !maximizing && best_result <= alpha {
-                    // alpha beta pruning only after first move so all first moves are still possible
-                    break;
+                if level == 0 {
+                    *best_move = index;
                 }
             }
-            if top_level {
-                if result == best_result {
-                    best_moves.push(index);
+
+            // alpha beta pruning
+            if maximizing {
+                alpha = std::cmp::max(alpha, best_result);
+                if alpha >= beta {
+                    break;
+                }
+            } else {
+                beta = std::cmp::min(beta, best_result);
+                if beta <= alpha {
+                    break;
                 }
             }
         }
@@ -110,9 +109,9 @@ impl MinimaxPlayer {
 
 impl Player for MinimaxPlayer {
     fn play(&self, board: &Board, piece: Piece) -> Index {
-        let (best_moves, counter) = MinimaxPlayer::minimax_search(board.clone(), piece);
+        let (best_move, counter) = MinimaxPlayer::minimax_search(board.clone(), piece);
         println!("Searched {} possible games!", counter);
 
-        best_moves[rand::thread_rng().gen_range(0, best_moves.len())]
+        best_move
     }
 }
