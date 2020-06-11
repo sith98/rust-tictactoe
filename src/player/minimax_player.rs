@@ -20,7 +20,7 @@ impl Display for MinimaxPlayer {
 
 // minimax
 impl MinimaxPlayer {
-    fn minimax_search(board: Board, piece: Piece) -> (Index, u32) {
+    fn minimax_search(board: &Board, piece: Piece) -> (Index, u32) {
         let mut counter = 0;
         let mut best_move = 0;
         let mut indeces: Vec<_> = Board::VALID_INDECES.collect();
@@ -111,7 +111,7 @@ impl MinimaxPlayer {
 
 impl Player for MinimaxPlayer {
     fn play(&self, board: &Board, piece: Piece) -> Index {
-        let (best_move, counter) = MinimaxPlayer::minimax_search(board.clone(), piece);
+        let (best_move, counter) = MinimaxPlayer::minimax_search(board, piece);
         println!("searched {} possible games!", counter);
 
         best_move
