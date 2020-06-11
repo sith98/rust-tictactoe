@@ -20,10 +20,19 @@ pub fn choose_player(c: &str) -> Option<Box<dyn Player>> {
     }
 }
 
-pub fn random_player() -> Box<dyn Player> {
-    let boxes: &mut [Option<Box<dyn Player>>] =
-        &mut [Some(Box::new(HumanPlayer)), Some(Box::new(MinimaxPlayer))];
+// pub fn random_player() -> Box<dyn Player> {
 
-    let index = rand::thread_rng().gen_range(0, boxes.len());
-    boxes[index].take().unwrap()
+//     let boxes: &mut [Option<Box<dyn Player>>] =
+//         &mut [Some(Box::new(HumanPlayer)), Some(Box::new(MinimaxPlayer))];
+
+//     let index = rand::thread_rng().gen_range(0, boxes.len());
+//     boxes[index].take().unwrap()
+// }
+
+pub fn random_player() -> Box<dyn Player> {
+    match rand::thread_rng().gen_range(0, 2) {
+        0 => Box::new(HumanPlayer),
+        1 => Box::new(MinimaxPlayer),
+        _ => unreachable!(),
+    }
 }

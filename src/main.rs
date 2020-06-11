@@ -9,12 +9,12 @@ fn main() {
     let player_x: Box<dyn player::Player> = args
         .get(1)
         .and_then(|s| player::choose_player(&s))
-        .unwrap_or(player::random_player());
+        .unwrap_or_else(player::random_player);
 
     let player_o: Box<dyn player::Player> = args
         .get(2)
         .and_then(|s| player::choose_player(&s))
-        .unwrap_or(player::random_player());
+        .unwrap_or_else(player::random_player);
 
     let mut board = Board::new();
 
