@@ -4,10 +4,22 @@ mod player;
 fn main() {
     use board::*;
 
+    let args: Vec<_> = std::env::args().collect();
+
+    let player_x: Box<dyn player::Player> = args
+        .get(1)
+        .and_then(|s| player::choose_player(&s))
+        .unwrap_or(player::random_player());
+
+    let player_o: Box<dyn player::Player> = args
+        .get(2)
+        .and_then(|s| player::choose_player(&s))
+        .unwrap_or(player::random_player());
+
     let mut board = Board::new();
 
-    let player_x = player::MinimaxPlayer::new();
-    let player_o = player::HumanPlayer::new();
+    println!("X: {}, O: {}", player_x, player_o);
+    println!("Game has started!");
 
     fn check_game_over(board: &Board) -> bool {
         if board.is_draw() {
@@ -28,11 +40,12 @@ fn main() {
             break;
         }
         let player: &dyn player::Player = if current_piece == Piece::X {
-            &player_x
+            player_x.as_ref()
         } else {
-            &player_o
+            player_o.as_ref()
         };
 
+        print!("Player {}: ", current_piece);
         let index = player.play(&board, current_piece);
         board.place_piece(index, current_piece);
 

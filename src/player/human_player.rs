@@ -1,17 +1,19 @@
 use super::Player;
 use crate::board::{Board, Index, Piece};
+use std::fmt::{Display, Error, Formatter};
 
 pub struct HumanPlayer;
-impl HumanPlayer {
-    pub fn new() -> Self {
-        HumanPlayer
+
+impl Display for HumanPlayer {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> Result<(), Error> {
+        formatter.write_str("Human player")
     }
 }
 
 impl Player for HumanPlayer {
-    fn play(&self, board: &Board, piece: Piece) -> Index {
+    fn play(&self, board: &Board, _: Piece) -> Index {
+        println!("select a cell...");
         loop {
-            println!("Player {}: select a cell...", piece);
             let mut buffer = String::new();
             std::io::stdin().read_line(&mut buffer).unwrap();
 

@@ -1,19 +1,21 @@
 use super::Player;
 use crate::board::{Board, Index, Piece};
 use rand::seq::SliceRandom;
+use std::fmt::{Display, Error, Formatter};
 
 pub struct MinimaxPlayer;
-impl MinimaxPlayer {
-    pub fn new() -> Self {
-        Self
-    }
-}
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Debug)]
 enum GameResult {
     Defeat,
     Draw,
     Victory,
+}
+
+impl Display for MinimaxPlayer {
+    fn fmt(&self, formatter: &mut Formatter<'_>) -> Result<(), Error> {
+        formatter.write_str("Minimax player")
+    }
 }
 
 // minimax
@@ -110,7 +112,7 @@ impl MinimaxPlayer {
 impl Player for MinimaxPlayer {
     fn play(&self, board: &Board, piece: Piece) -> Index {
         let (best_move, counter) = MinimaxPlayer::minimax_search(board.clone(), piece);
-        println!("Searched {} possible games!", counter);
+        println!("searched {} possible games!", counter);
 
         best_move
     }
