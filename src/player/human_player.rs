@@ -13,11 +13,13 @@ impl Display for HumanPlayer {
 impl Player for HumanPlayer {
     fn play(&self, board: &Board, _: Piece) -> Index {
         println!("select a cell...");
+
+        let mut buffer = String::new();
         loop {
-            let mut buffer = String::new();
+            buffer.clear();
             std::io::stdin().read_line(&mut buffer).unwrap();
 
-            let index: usize = match buffer.trim().parse() {
+            let index: Index = match buffer.trim().parse() {
                 Err(_) => {
                     println!("Please enter a number!");
                     continue;
