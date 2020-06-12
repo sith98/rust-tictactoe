@@ -56,14 +56,14 @@ impl MinimaxPlayer {
 
         *counter += 1;
 
-        if board.is_draw() {
-            return Draw;
-        }
         if board.is_victory_for_player(piece) {
             return Victory;
         }
         if board.is_victory_for_player(piece.swap()) {
             return Defeat;
+        }
+        if board.is_draw() {
+            return Draw;
         }
 
         let mut best_result = if maximizing { Defeat } else { Victory };

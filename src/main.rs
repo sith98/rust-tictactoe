@@ -22,11 +22,11 @@ fn main() {
     println!("Game has started!");
 
     fn check_game_over(board: &Board) -> bool {
-        if board.is_draw() {
-            println!("Draw!");
-            true
-        } else if let Some(piece) = board.is_victory() {
+        if let Some(piece) = board.is_victory() {
             println!("Player {} won!", piece);
+            true
+        } else if board.is_draw() {
+            println!("Draw!");
             true
         } else {
             false
