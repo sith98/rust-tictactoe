@@ -74,10 +74,10 @@ impl Board {
     }
 
     pub fn is_victory_for_player(&self, player: Piece) -> bool {
-        for (a, b, c) in WINNING_INDECES {
-            if self.board[*a] == Some(player)
-                && self.board[*b] == Some(player)
-                && self.board[*c] == Some(player)
+        for &(a, b, c) in WINNING_INDECES {
+            if self.board[a] == Some(player)
+                && self.board[b] == Some(player)
+                && self.board[c] == Some(player)
             {
                 return true;
             }
