@@ -15,13 +15,15 @@ pub trait Player: Display {
 pub fn choose_player(c: &str) -> Option<Box<dyn Player>> {
     match c.to_lowercase().as_str() {
         "human" | "h" => Some(Box::new(HumanPlayer)),
-        "minimax" | "m" => Some(Box::new(MinimaxPlayer)),
+        "minimax" | "m" => Some(Box::new(MinimaxPlayer::new(false))),
+        "alphabeta" | "a" => Some(Box::new(MinimaxPlayer::new(true))),
         _ => None,
     }
 }
 
 pub fn random_player() -> Box<dyn Player> {
-    let mut boxes: Vec<Box<dyn Player>> = vec![Box::new(HumanPlayer), Box::new(MinimaxPlayer)];
+    let mut boxes: Vec<Box<dyn Player>> =
+        vec![Box::new(HumanPlayer), Box::new(MinimaxPlayer::new(true))];
 
     let index = rand::thread_rng().gen_range(0, boxes.len());
     boxes.remove(index)

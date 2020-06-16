@@ -3,7 +3,14 @@ use crate::board::{Board, Index, Piece};
 use rand::seq::SliceRandom;
 use std::fmt::{Display, Error, Formatter};
 
-pub struct MinimaxPlayer;
+pub struct MinimaxPlayer {
+    alpha_beta: bool,
+}
+impl MinimaxPlayer {
+    pub fn new(alpha_beta: bool) -> Self {
+        MinimaxPlayer { alpha_beta }
+    }
+}
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Debug)]
 enum GameResult {
@@ -20,14 +27,14 @@ impl Display for MinimaxPlayer {
 
 // minimax
 impl MinimaxPlayer {
-    fn minimax_search(board: &Board, piece: Piece) -> (Index, u32) {
+    fn minimax_search(&self, board: &Board, piece: Piece) -> (Index, u32) {
         let mut counter = 0;
         let mut best_move = 0;
         let mut indeces: Vec<_> = Board::VALID_INDECES.collect();
 
         indeces.shuffle(&mut rand::thread_rng());
 
-        Self::minimax_step(
+        self.minimax_step(
             board.clone(),
             piece,
             true,
@@ -42,6 +49,7 @@ impl MinimaxPlayer {
     }
 
     fn minimax_step(
+        &self,
         board: Board,
         piece: Piece,
         maximizing: bool,
@@ -74,7 +82,7 @@ impl MinimaxPlayer {
 
             let mut new_board = board.clone();
             new_board.place_piece(index, if maximizing { piece } else { piece.swap() });
-            let result = Self::minimax_step(
+            let result = self.minimax_step(
                 new_board,
                 piece,
                 !maximizing,
@@ -93,15 +101,17 @@ impl MinimaxPlayer {
             }
 
             // alpha beta pruning
-            if maximizing {
-                alpha = std::cmp::max(alpha, best_result);
-                if alpha >= beta {
-                    break;
-                }
-            } else {
-                beta = std::cmp::min(beta, best_result);
-                if beta <= alpha {
-                    break;
+            if self.alpha_beta {
+                if maximizing {
+                    alpha = std::cmp::max(alpha, best_result);
+                    if alpha >= beta {
+                        break;
+                    }
+                } else {
+                    beta = std::cmp::min(beta, best_result);
+                    if beta <= alpha {
+                        break;
+                    }
                 }
             }
         }
@@ -111,7 +121,7 @@ impl MinimaxPlayer {
 
 impl Player for MinimaxPlayer {
     fn play(&self, board: &Board, piece: Piece) -> Index {
-        let (best_move, counter) = MinimaxPlayer::minimax_search(board, piece);
+        let (best_move, counter) = self.minimax_search(board, piece);
         println!("searched {} possible games!", counter);
 
         best_move
